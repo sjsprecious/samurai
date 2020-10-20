@@ -382,9 +382,9 @@ bool VarDriver3D::run()
 	int iter = 1;
 	while (iter <= maxIter) {
 		if (iter < maxIter) {
-			configHash["save_mish"] = "true";
+                       configHash.update("save_mish", "true");
 		} else {
-			configHash["save_mish"] = "false";
+                       configHash.update("save_mish", "false");
 		}
 		cout << "Outer Loop Iteration: " << iter << endl;
 		START_TIMER(timei);
@@ -1952,59 +1952,59 @@ void VarDriver3D::updateAnalysisParams(const int& iteration)
 
     std::string key = "bg_rhou_error_" + iter;
     std::string val = configHash[key];
-    configHash.insert("bg_rhou_error", val);
+    configHash.update("bg_rhou_error", val);
 
     key = "bg_rhov_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_rhov_error", val);
+    configHash.update("bg_rhov_error", val);
 
     key = "bg_rhow_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_rhow_error", val);
+    configHash.update("bg_rhow_error", val);
 
     key = "bg_tempk_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_tempk_error", val);
+    configHash.update("bg_tempk_error", val);
 
     key = "bg_qv_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_qv_error", val);
+    configHash.update("bg_qv_error", val);
 
     key = "bg_rhoa_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_rhoa_error", val);
+    configHash.update("bg_rhoa_error", val);
 
     key = "bg_qr_error_" + iter;
     val = configHash[key];
-    configHash.insert("bg_qr_error", val);
+    configHash.update("bg_qr_error", val);
 
     key = "mc_weight_" + iter;
     val = configHash[key];
-    configHash.insert("mc_weight", val);
+    configHash.update("mc_weight", val);
 
     key = "i_filter_length_" + iter;
     val = configHash[key];
-    configHash.insert("i_filter_length", val);
+    configHash.update("i_filter_length", val);
 
     key = "j_filter_length_" + iter;
     val = configHash[key];
-    configHash.insert("j_filter_length", val);
+    configHash.update("j_filter_length", val);
 
     key = "k_filter_length_" + iter;
     val = configHash[key];
-    configHash.insert("k_filter_length", val);
+    configHash.update("k_filter_length", val);
 
     key = "i_spline_cutoff_" + iter;
     val = configHash[key];
-    configHash.insert("i_spline_cutoff", val);
+    configHash.update("i_spline_cutoff", val);
 
     key = "j_spline_cutoff_" + iter;
     val = configHash[key];
-    configHash.insert("j_spline_cutoff", val);
+    configHash.update("j_spline_cutoff", val);
 
     key = "k_spline_cutoff_" + iter;
     val = configHash[key];
-    configHash.insert("k_spline_cutoff", val);
+    configHash.update("k_spline_cutoff", val);
 }
 
 /* This routine validates that all required parameters are present

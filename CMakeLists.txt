@@ -4,20 +4,20 @@ project(samurai)
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set ( MODE CPU )                                   # NCAR: Options are 'CPU' or 'GPU' - CPU enables OpenMP, GPU enables OpenACC (default: CPU)
-set ( CMAKE_BUILD_TYPE Release )                     # Standard: Options are 'Debug' or 'Release'
+set ( CMAKE_BUILD_TYPE Release )                   # Standard: Options are 'Debug' or 'Release'
 
 
-set ( SOLVER_MAXITER 2000 )        # max iterations in the solver (src/CostFunction.cpp) default=2000
-set ( SOLVER_INNER_MAXITER 4000 )  # max interations for inner loop with TN solver default=4000
-set ( SOLVER_SAMURAI 1)            # 1= truncated Newton solver, 2 = Samurai CG (orig)
-set ( SOLVER_CONV_TOL 1.0e-4 )     # solver convergence tolerance
-set ( SOLVER_INNER_CONV_TOL 1.0e-4)  # solver convergence tolerance for the inner loop with TN (usually = conv_tol for best results)
-set ( SOLVER_VERBOSE 1)            # 1 = print out extra solver converegnce info. (0 =  no extra printing)
-set ( SOLVER_CG_EPSILON 1.0e-18 )  # epsilon for the Samurai NCG solver
-set ( SOLVER_CG_BETA_TYPE 2 )      # specify beta for Samurai NCG solver (1 = PR  (orig), 2 = PRP+ (recommended), 3 = FR, 4 = DY, 5 = HZ)
-set ( SOLVER_CG_CONV_TYPE 1)       # type of convergenve for Samurai CG (1 = ~step size (orig), 2 = ||g(X)||/||g(X0)||)
-set ( IO_BENCHMARK 0 )  # Controls whether to just do the I/O portion of the run; this is just for testing
-set ( IO_WRITEOBS 0 )   # Controls whether we write out the observations after reading them all in (probably safe to be 0)
+set ( SOLVER_MAXITER 2000 )                       # max iterations in the solver (src/CostFunction.cpp) default=2000
+set ( SOLVER_INNER_MAXITER 1000 )    #4000        # max interations for inner loop with TN solver default=4000
+set ( SOLVER_SAMURAI 2)              #1           # 1= truncated Newton solver, 2 = Samurai CG (orig)
+set ( SOLVER_CONV_TOL 1.0e-5    )    #1.0e-4      # solver convergence tolerance
+set ( SOLVER_INNER_CONV_TOL 1.0e-5)  #1.0e-4      # solver convergence tolerance for the inner loop with TN (usually = conv_tol for best results)
+set ( SOLVER_VERBOSE 1)                 	  # 1 = print out extra solver converegnce info. (0 =  no extra printing)
+set ( SOLVER_CG_EPSILON 1.0e-18 )       	  # epsilon for the Samurai NCG solver
+set ( SOLVER_CG_BETA_TYPE 1 )        #2        	  # specify beta for Samurai NCG solver (1 = PR  (orig), 2 = PRP+ (recommended), 3 = FR, 4 = DY, 5 = HZ)
+set ( SOLVER_CG_CONV_TYPE 1)            	  # type of convergenve for Samurai CG (1 = ~step size (orig), 2 = ||g(X)||/||g(X0)||)
+set ( IO_BENCHMARK 0 )                  	  # Controls whether to just do the I/O portion of the run; this is just for testing
+set ( IO_WRITEOBS 0 )                   	  # Controls whether we write out the observations after reading them all in (probably safe to be 0)
 
 # ----- Users shouldn't need to change anything below this, hopefully ----- 
 
