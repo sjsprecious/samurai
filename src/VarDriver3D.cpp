@@ -1867,14 +1867,14 @@ bool VarDriver3D::adjustBackground()
   } else {
     cout << "Using default background interpolation error of 1.0\n";
   }
-  configHash["bg_rhou_error"] = bg_interpolation_error;
-  configHash["bg_rhov_error"] = bg_interpolation_error;
-  configHash["bg_rhow_error"] = bg_interpolation_error;
-  configHash["bg_tempk_error"] = bg_interpolation_error;
-  configHash["bg_qv_error"] = bg_interpolation_error;
-  configHash["bg_rhoa_error"] = bg_interpolation_error;
-  configHash["bg_qr_error"] = bg_interpolation_error;
-  configHash["save_mish"] = "true";
+  configHash.update("bg_rhou_error", bg_interpolation_error);
+  configHash.update("bg_rhov_error", bg_interpolation_error);
+  configHash.update("bg_rhow_error", bg_interpolation_error);
+  configHash.update("bg_tempk_error", bg_interpolation_error);
+  configHash.update("bg_qv_error", bg_interpolation_error);
+  configHash.update("bg_rhoa_error", bg_interpolation_error);
+  configHash.update("bg_qr_error", bg_interpolation_error);
+  configHash.update("save_mish", "true");
   
   // Adjust the background field to the spline mish
   
@@ -1906,14 +1906,14 @@ bool VarDriver3D::adjustBackground()
 
   // Reset the background errors
   
-  configHash["bg_rhou_error"] = bgError[0];
-  configHash["bg_rhov_error"] = bgError[1];
-  configHash["bg_rhow_error"] = bgError[2];
-  configHash["bg_tempk_error"] = bgError[3];
-  configHash["bg_qv_error"] = bgError[4];
-  configHash["bg_rhoa_error"] = bgError[5];
-  configHash["bg_qr_error"] = bgError[6];
-  configHash["save_mish"] = "false";
+  configHash.update("bg_rhou_error", bgError[0]);
+  configHash.update("bg_rhov_error", bgError[1]);
+  configHash.update("bg_rhow_error", bgError[2]);
+  configHash.update("bg_tempk_error", bgError[3]);
+  configHash.update("bg_qv_error", bgError[4]);
+  configHash.update("bg_rhoa_error", bgError[5]);
+  configHash.update("bg_qr_error", bgError[6]);
+  configHash.update("save_mish", "false");
 
   // Convert the dBZ back to Z for further processing
   
