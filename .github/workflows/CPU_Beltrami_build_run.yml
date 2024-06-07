@@ -1,11 +1,12 @@
 name: Samurai CPU test with Beltrami
 
 on:
+  workflow_dispatch:
+    branches: [ "main" ]
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-  workflow_dispath:
+    branches: [ "main" ]
 
 jobs:
   docker-build-and-test:
