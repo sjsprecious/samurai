@@ -61,7 +61,7 @@ cd build
 if [ "$MODE" == "GPU" ]; then
    cmake -DUSE_GPU=true -DDEBUG_COMPILE=false ..
 else
-   cmake -DDEBUG_COMPILE=false ..
+   cmake -DDEBUG_COMPILE=false -DENABLE_BENCHMARK=ON ..
 fi
 
 make -j 8 VERBOSE=1

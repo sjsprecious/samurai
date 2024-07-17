@@ -115,6 +115,23 @@ if(ENABLE_COVERAGE)
       BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/src")
 endif()
 
+# Enable Google Benchmark
+option(ENABLE_BENCHMARK "Enable benchmark tests" OFF)
+if(ENABLE_BENCHMARK)
+  include(FetchContent)
+  FetchContent_Declare(
+    googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.8.3)
+
+  set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+  set(BENCHMARK_ENABLE_ASSEMBLY_TESTS OFF)
+  set(BENCHMARK_ENABLE_TESTING OFF)
+  FetchContent_MakeAvailable(googlebenchmark)
+  add_subdirectory(benchmark)
+endif()
+
 # recurse into src directory for the build
 
 add_subdirectory(src)
