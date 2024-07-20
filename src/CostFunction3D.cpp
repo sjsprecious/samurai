@@ -558,8 +558,8 @@ void CostFunction3D::initState(const int iteration)
       {
         for (int kIndex = 0; kIndex < kDim; kIndex++)
         {
-          // 	  			int bIndex = varDim * iDim * jDim * kIndex + varDim * iDim * jIndex + varDim * iIndex +
-          // var;
+          // 	  			int bIndex = varDim * iDim * jDim * kIndex + varDim * iDim * jIndex + varDim * iIndex
+          // + var;
           int64_t bIndex = INDEX(iIndex, jIndex, kIndex, iDim, jDim, varDim, var);
           //                 int64_t *bIndex = (int64_t *)malloc(sizeof(int64_t));
           // 	  			*bIndex = INDEX(iIndex, jIndex, kIndex, iDim, jDim, varDim, var);
@@ -2886,7 +2886,7 @@ void CostFunction3D::calcHmatrix()
 // GPTLstart("CostFunction3D::calcHmatrix:nnz");
 //  Determine the number of non-zeros in H
 //#pragma omp parallel for
-//private(m,mi,hi,i,j,k,ii,iis,iie,jj,jjs,jje,kk,kks,kke,ibasis,jbasis,kbasis,iiNode,jjNode,kkNode,iNode,jNode,kNode,var,d,wgt_index,weight,cIndex)
+// private(m,mi,hi,i,j,k,ii,iis,iie,jj,jjs,jje,kk,kks,kke,ibasis,jbasis,kbasis,iiNode,jjNode,kkNode,iNode,jNode,kNode,var,d,wgt_index,weight,cIndex)
 ////[8.1]
 #pragma acc parallel loop vector gang vector_length(32) private(m,mi,hi,iis,iie,jjs,jje,kks,kke,ibasis,jbasis,kbasis,iiNode,jjNode,kkNode,iNode,jNode,kNode,var,d,wgt_index,weight,cIndex) reduction(+:nnz)
   for (m = 0; m < mObs; m++)
