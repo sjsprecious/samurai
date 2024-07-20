@@ -1,36 +1,44 @@
-#include <iostream>
 #include "BkgdAdapter.h"
+
+#include <iostream>
 
 // ---------------------- BkgdArray --------------------------
 
-BkgdArray::BkgdArray(int nx, int ny, int nsigma,
-		     char *ctdg, int delta, int iter, // time elements
-		     float *sigmas,
-		     float *latitude,	// these 3 are 2D
-		     float *longitude,
-				 float *terrain_Height,
-		     float *u1,		// these are 3D
-		     float *v1,
-		     float *w1,
-		     float *th1,
-		     float *p1)
+BkgdArray::BkgdArray(
+    int nx,
+    int ny,
+    int nsigma,
+    char *ctdg,
+    int delta,
+    int iter,  // time elements
+    float *sigmas,
+    float *latitude,  // these 3 are 2D
+    float *longitude,
+    float *terrain_Height,
+    float *u1,  // these are 3D
+    float *v1,
+    float *w1,
+    float *th1,
+    float *p1)
 {
   _xd = nx;
   _yd = ny;
   _zd = nsigma;
 
   // set the time for the observations
-	_obTime = ParseDate(ctdg, "%Y%m%d") + std::chrono::seconds(delta * iter);//  YYYMMDDHH_to_seconds(ctdg) + std::chrono::seconds(delta * iter));
+  _obTime = ParseDate(ctdg, "%Y%m%d") +
+            std::chrono::seconds(delta * iter);  //  YYYMMDDHH_to_seconds(ctdg) + std::chrono::seconds(delta * iter));
   {
     using namespace date;
     using namespace std::chrono;
-    std::cout << "Observations will be stamped " << _obTime << " time_t: " << std::chrono::system_clock::to_time_t(_obTime) << std::endl;
+    std::cout << "Observations will be stamped " << _obTime << " time_t: " << std::chrono::system_clock::to_time_t(_obTime)
+              << std::endl;
   }
 
   _sigmas = sigmas;
-  _lat_2d  = latitude;
+  _lat_2d = latitude;
   _long_2d = longitude;
-	_terrainHgt_2d = terrain_Height;
+  _terrainHgt_2d = terrain_Height;
 
   _u1_3d = u1;
   _v1_3d = v1;
@@ -43,22 +51,33 @@ BkgdArray::BkgdArray(int nx, int ny, int nsigma,
   _curr_z = _zd - 1;
 }
 
-
 BkgdArray::~BkgdArray()
 {
 }
 
-bool BkgdArray::next(std::string &time, real &lat, real &lon, real &alt, real &u,
-	    real &v, real &w, real &t, real &qv, real &rhoa, real &qr, real &terrain_hgt)
+bool BkgdArray::next(
+    std::string &time,
+    real &lat,
+    real &lon,
+    real &alt,
+    real &u,
+    real &v,
+    real &w,
+    real &t,
+    real &qv,
+    real &rhoa,
+    real &qr,
+    real &terrain_hgt)
 {
-  if(_curr_x >= _xd) return false;
+  if (_curr_x >= _xd)
+    return false;
 
 #if 0
   std::cout << "in next() time is " << _obTime << " time_t() : " << std::chrono::system_clock::to_time_t(_obTime) << std::endl;
 #endif
   lat = item2d(_lat_2d, _curr_x, _curr_y);
   lon = item2d(_long_2d, _curr_x, _curr_y);
-	terrain_hgt = item2d(_terrainHgt_2d, _curr_x, _curr_y);
+  terrain_hgt = item2d(_terrainHgt_2d, _curr_x, _curr_y);
   alt = _sigmas[_curr_z];
   u = item3d(_u1_3d, _curr_x, _curr_y, _curr_z);
   v = item3d(_v1_3d, _curr_x, _curr_y, _curr_z);
@@ -76,7 +95,7 @@ bool BkgdArray::next(std::string &time, real &lat, real &lon, real &alt, real &u
 
   // qv = ?
   // rhoa = ?
-  qr = 0; // for now
+  qr = 0;  // for now
 
   // TODO Double (and triple) check this.
   // From the Samurai doc:
@@ -87,10 +106,12 @@ bool BkgdArray::next(std::string &time, real &lat, real &lon, real &alt, real &u
   // This assumes that altitudes are in decreasing order
 
   _curr_z -= 1;
-  if(_curr_z < 0) {
+  if (_curr_z < 0)
+  {
     _curr_z = _zd - 1;
     _curr_y += 1;
-    if(_curr_y >= _yd) {
+    if (_curr_y >= _yd)
+    {
       _curr_y %= _yd;
       _curr_x += 1;
     }
@@ -104,7 +125,6 @@ bool BkgdArray::next(std::string &time, real &lat, real &lon, real &alt, real &u
 BkgdFArray::~BkgdFArray()
 {
 }
-
 
 // Return the item at the given position
 // a3d is a 3d array.
@@ -126,7 +146,6 @@ float BkgdFArray::item2d(float *a2d, int x, int y)
 BkgdCArray::~BkgdCArray()
 {
 }
-
 
 // Return the item at the given position
 // a3d is a 3d array.

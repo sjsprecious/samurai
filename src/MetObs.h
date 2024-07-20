@@ -14,17 +14,16 @@
 /*
  * Constants
  */
-# define _A_	5.0065
-# define _B_	19.83923
-# define C_P	1005.7
-# define R_D	287.
-# define E_3	6.1078
-# define T_3	273.15
-# define EPSILON	0.622
+#define _A_     5.0065
+#define _B_     19.83923
+#define C_P     1005.7
+#define R_D     287.
+#define E_3     6.1078
+#define T_3     273.15
+#define EPSILON 0.622
 
 class MetObs
 {
-
  public:
   MetObs();
   MetObs(const MetObs& other);
@@ -131,11 +130,12 @@ class MetObs
   float getMoistSaturationStaticEnergy() const;
   float getTotalEnergy() const;
 
-  bool operator ==(const MetObs &other);
-  bool operator < (const MetObs &other);
-  bool operator > (const MetObs &other);
+  bool operator==(const MetObs& other);
+  bool operator<(const MetObs& other);
+  bool operator>(const MetObs& other);
 
-  enum MetObTypes {
+  enum MetObTypes
+  {
     dropsonde,
     flightlevel,
     radar,
@@ -156,7 +156,6 @@ class MetObs
   };
 
  protected:
-
   float latitude;
   float longitude;
   float altitude;
@@ -187,8 +186,6 @@ class MetObs
   // float differentialReflectivity; add Zdr
   // float
   // add terrain slope here
-
-
 };
 
 #endif

@@ -1,59 +1,68 @@
 #ifndef BKGD_OBS_LOADER_H
 #define BKGD_OBS_LOADER_H
 
-#include <iostream>
-#include <vector>
-
-#include <string>
-#include <unordered_map>
-
-#include <kd/kd.hh>	// KD Tree implementation from Lrose
-
-#include "FrameCenter.h"
 #include "BkgdAdapter.h"
+#include "FrameCenter.h"
+#include "HashMap.h"
 #include "Projection.h"
 #include "ReferenceState.h"
-#include "HashMap.h"
 #include "datetime.h"
 #include "precision.h"
+
+#include <kd/kd.hh>  // KD Tree implementation from Lrose
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // Various loader for background observations
 // This allows having different interpolation methods
 
-class BkgdObsLoader {
-
+class BkgdObsLoader
+{
  public:
-
   BkgdObsLoader();
   virtual ~BkgdObsLoader();
 
   virtual bool loadBkgdObs(std::vector<real> &bgIn) = 0;
 
-  bool timeCheck(real time, datetime& startTime, datetime& endTime, int &tci);
+  bool timeCheck(real time, datetime &startTime, datetime &endTime, int &tci);
 
-  virtual bool initialize(HashMap *config,
-			  std::vector<FrameCenter> frames,
-			  BkgdAdapter *adapter,
-			  Projection proj,
-			  ReferenceState *refSt,
-			  int64_t uStSize,
-			  real *bgu,			// TODO s this right? vector<real> maybe
-			  unsigned int varsNum,
-			  int id, int jd, int kd,
-			  float imn, float jmn, float kmn,
-			  float imx, float jmx, float kmx,
-			  real iinc, real jinc, real kinc);
+  virtual bool initialize(
+      HashMap *config,
+      std::vector<FrameCenter> frames,
+      BkgdAdapter *adapter,
+      Projection proj,
+      ReferenceState *refSt,
+      int64_t uStSize,
+      real *bgu,  // TODO s this right? vector<real> maybe
+      unsigned int varsNum,
+      int id,
+      int jd,
+      int kd,
+      float imn,
+      float jmn,
+      float kmn,
+      float imx,
+      float jmx,
+      float kmx,
+      real iinc,
+      real jinc,
+      real kinc);
 
   KD_tree *buildKDTree(std::vector<double> &bgIn);
 
   bool fillHoles(std::vector<int> &emptybg);
-  bool isTrue(const char *flag_in) {
-		std::string flag = flag_in;
-		if ((*configHash)[flag] == "true") {
-		  return true;
-		}
-		return false;
-	}
+  bool isTrue(const char *flag_in)
+  {
+    std::string flag = flag_in;
+    if ((*configHash)[flag] == "true")
+    {
+      return true;
+    }
+    return false;
+  }
   void dumpBgIn(int from, int to, std::vector<real> &bgIn);
   void dumpBgU(int from, int to, real *bgu);
   void bgu2nc(const char *fname, real *bgu);
@@ -61,20 +70,21 @@ class BkgdObsLoader {
   typedef BSpline<real> SplineD;
   typedef BSplineBase<real> SplineBase;
 
-  typedef enum {
+  typedef enum
+  {
     BG_LOADER_PRE,
     BG_LOADER_SPLINE,
     BG_LOADER_KD,
     BG_LOADER_FRACTL
   } bg_loader_t;
 
-  typedef enum {
+  typedef enum
+  {
     RUN_MODE_XYZ,
     RUN_MODE_RTZ
   } run_mode_t;
 
  protected:
-
   BkgdAdapter *bkgdAdapter;
 
   real iincr, jincr, kincr;
@@ -82,7 +92,7 @@ class BkgdObsLoader {
   float imin, jmin, kmin;
   float imax, jmax, kmax;
 
-  HashMap* configHash;
+  HashMap *configHash;
   std::vector<FrameCenter> frameVector;
   Projection projection;
 
@@ -104,21 +114,18 @@ class BkgdObsLoader {
 
   real maxGridDist;
   real iROI, jROI;
-
 };
 
 // ----------------- Load preprocessed background obs --------------------
 
-class BkgdObsPreLoader : public BkgdObsLoader {
-
+class BkgdObsPreLoader : public BkgdObsLoader
+{
  public:
-
   BkgdObsPreLoader();
   ~BkgdObsPreLoader();
 
   bool loadBkgdObs(std::vector<real> &bgIn);
 };
-
 
 // --------------- Load using a spline -----------------------
 
@@ -127,42 +134,47 @@ class BkgdObsPreLoader : public BkgdObsLoader {
 //   exponential interpolation in horizontal dimensions
 //   b-spline interpolation on log height in vertical
 
-class BkgdObsSplineLoader : public BkgdObsLoader {
-
+class BkgdObsSplineLoader : public BkgdObsLoader
+{
  public:
-
   BkgdObsSplineLoader();
   ~BkgdObsSplineLoader();
 
   bool loadBkgdObs(std::vector<real> &bgIn);
 
-  bool initialize(HashMap *config,
-		  std::vector<FrameCenter> frames,
-		  BkgdAdapter *adapter,
-		  Projection proj,
-		  ReferenceState *refSt,
-		  int64_t uStSize,
-		  real *bgu,
-		  unsigned int varsNum,
-		  int id, int jd, int kd,
-		  float imn, float jmn, float kmn,
-		  float imx, float jmx, float kmx,
-		  real iinc, real jinc, real kinc);
+  bool initialize(
+      HashMap *config,
+      std::vector<FrameCenter> frames,
+      BkgdAdapter *adapter,
+      Projection proj,
+      ReferenceState *refSt,
+      int64_t uStSize,
+      real *bgu,
+      unsigned int varsNum,
+      int id,
+      int jd,
+      int kd,
+      float imn,
+      float jmn,
+      float kmn,
+      float imx,
+      float jmx,
+      float kmx,
+      real iinc,
+      real jinc,
+      real kinc);
 
  protected:
-
   bool splineSolver(int waveLen);
-
 };
 
 // --------------- Load using KD Tree -----------------------
 // This is the method used by FRACL (previously RadarWind)
 // Uses a KD tree to find nearest neighbors
 
-class BkgdObsKDLoader : public BkgdObsLoader {
-
+class BkgdObsKDLoader : public BkgdObsLoader
+{
  public:
-
   BkgdObsKDLoader();
   ~BkgdObsKDLoader();
 
@@ -170,19 +182,24 @@ class BkgdObsKDLoader : public BkgdObsLoader {
   bool loadBkgdObs(std::vector<real> &bgIn);
 
  protected:
-
-  bool fillBguEntry(KD_real *centerLoc, int nbrMax, float maxDistance,
-		    std::vector<real> &bgIn, KD_tree *kdTree, real *bgU, int bIndex,
-		    std::vector<int> &emptybg, int debug);
+  bool fillBguEntry(
+      KD_real *centerLoc,
+      int nbrMax,
+      float maxDistance,
+      std::vector<real> &bgIn,
+      KD_tree *kdTree,
+      real *bgU,
+      int bIndex,
+      std::vector<int> &emptybg,
+      int debug);
   bool overwriteBgu(const char *fname);
 };
 
 // --------------- Load FRACTL generated Netcdf file -----------------------
 
-class BkgdObsFractlLoader : public BkgdObsLoader {
-
+class BkgdObsFractlLoader : public BkgdObsLoader
+{
  public:
-
   BkgdObsFractlLoader();
   ~BkgdObsFractlLoader();
 
@@ -193,10 +210,9 @@ class BkgdObsFractlLoader : public BkgdObsLoader {
 
 // --------------- Load WRF output Netcdf file -----------------------
 
-class BkgdObsWRFLoader : public BkgdObsLoader {
-
+class BkgdObsWRFLoader : public BkgdObsLoader
+{
  public:
-
   BkgdObsWRFLoader();
   ~BkgdObsWRFLoader();
 
@@ -208,11 +224,10 @@ class BkgdObsWRFLoader : public BkgdObsLoader {
 // ------------- Object Factory --------------
 // Return a subclass of BkgdObsLoader depending on the value of t
 
-class BkgdObsLoaderFactory {
-
+class BkgdObsLoaderFactory
+{
  public:
-
-  static  BkgdObsLoader *createBkgdObsLoader(BkgdObsLoader::bg_loader_t t);
+  static BkgdObsLoader *createBkgdObsLoader(BkgdObsLoader::bg_loader_t t);
 };
 
 #endif

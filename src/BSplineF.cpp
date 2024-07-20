@@ -17,7 +17,7 @@
  * supporting documentation.  UCAR makes no representations about the
  * suitability of this software for any purpose.  It is provided "as is"
  * without express or implied warranty.
- * 
+ *
  * Note from the author:
  *
  * Where possible, you are encouraged to follow the GNU General Public
@@ -32,7 +32,7 @@
  * a specific type.
  */
 #if WIN32
-# define BSPLINE_DLL_ __declspec(dllexport)
+  #define BSPLINE_DLL_ __declspec(dllexport)
 #endif
 
 #include "BSpline.cpp"

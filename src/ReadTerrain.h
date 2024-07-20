@@ -10,29 +10,32 @@
 // #ifndef READTERRAIN_H
 // #define READTERRAIN_H
 
+#include "MetObs.h"
 #include "VarDriver.h"
 #include "VarDriver3D.h"
-#include "MetObs.h"
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
+
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 class ReadTerrain
 {
-public:
-    bool readTerrainTXT(std::string &filename, std::vector<MetObs>* terrainData)
+ public:
+  bool readTerrainTXT(std::string& filename, std::vector<MetObs>* terrainData)
   {
     std::ifstream metFile(filename);
-    if (!metFile.is_open()) {
+    if (!metFile.is_open())
+    {
       return false;
-  	}
+    }
     MetObs ob;
     std::string line2;
 
-    while (std::getline(metFile, line2)) {
-  		// ob.setTime(datetime_);
+    while (std::getline(metFile, line2))
+    {
+      // ob.setTime(datetime_);
       auto parts = LineSplit(line2, ' ');
       ob.setLat(std::stof(parts[0]));
       ob.setLon(std::stof(parts[1]));
@@ -44,7 +47,7 @@ public:
       ob.setObType(MetObs::terrain);
       terrainData->push_back(ob);
     }
-  	// std::cout << "Successfully read the terrain file" << std::endl;
+    // std::cout << "Successfully read the terrain file" << std::endl;
     metFile.close();
     return true;
     // return read_terrain(metFile, metData);

@@ -50,36 +50,39 @@
 #define Params_hh
 
 #include <tdrp/tdrp.h>
-#include <iostream>
+
+#include <cfloat>
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <climits>
-#include <cfloat>
+#include <iostream>
 
 using namespace std;
 
 // Class definition
 
-class Params {
-
-public:
-
+class Params
+{
+ public:
   // enum typedefs
 
-  typedef enum {
+  typedef enum
+  {
     INTERP_NONE = 0,
     INTERP_SPLINE = 1,
     INTERP_KD_TREE = 2,
     INTERP_FRACTL = 3
   } bkgd_interp_method_t;
 
-  typedef enum {
+  typedef enum
+  {
     MODE_XYZ = 0,
     MODE_RTZ = 1
   } mode_t;
 
-  typedef enum {
+  typedef enum
+  {
     PROJ_LAMBERT_CONFORMAL_CONIC = 0,
     PROJ_TRANSVERSE_MERCATOR_EXACT = 1
   } projection_t;
@@ -92,19 +95,19 @@ public:
   // Default constructor
   //
 
-  Params ();
+  Params();
 
   ////////////////////////////////////////////
   // Copy constructor
   //
 
-  Params (const Params&);
+  Params(const Params&);
 
   ////////////////////////////////////////////
   // Destructor
   //
 
-  virtual ~Params ();
+  virtual ~Params();
 
   ////////////////////////////////////////////
   // Assignment
@@ -131,7 +134,7 @@ public:
   //     If this is non-NULL, it is set to point to the path
   //     of the params file used.
   //
-  //   bool defer_exit: normally, if the command args contain a 
+  //   bool defer_exit: normally, if the command args contain a
   //      print or check request, this function will call exit().
   //      If defer_exit is set, such an exit is deferred and the
   //      private member _exitDeferred is set.
@@ -140,12 +143,12 @@ public:
   //  Returns 0 on success, -1 on failure.
   //
 
-  int loadFromArgs(int argc, char **argv,
-                   char **override_list,
-                   char **params_path_p,
-                   bool defer_exit = false);
+  int loadFromArgs(int argc, char** argv, char** override_list, char** params_path_p, bool defer_exit = false);
 
-  bool exitDeferred() { return (_exitDeferred); }
+  bool exitDeferred()
+  {
+    return (_exitDeferred);
+  }
 
   ////////////////////////////////////////////
   // loadApplyArgs()
@@ -165,7 +168,7 @@ public:
   //     An override string has exactly the format of an entry
   //     in the parameter file itself.
   //
-  //   bool defer_exit: normally, if the command args contain a 
+  //   bool defer_exit: normally, if the command args contain a
   //      print or check request, this function will call exit().
   //      If defer_exit is set, such an exit is deferred and the
   //      private member _exitDeferred is set.
@@ -174,27 +177,24 @@ public:
   //  Returns 0 on success, -1 on failure.
   //
 
-  int loadApplyArgs(const char *params_path,
-                    int argc, char **argv,
-                    char **override_list,
-                    bool defer_exit = false);
+  int loadApplyArgs(const char* params_path, int argc, char** argv, char** override_list, bool defer_exit = false);
 
   ////////////////////////////////////////////
   // isArgValid()
-  // 
+  //
   // Check if a command line arg is a valid TDRP arg.
   //
 
-  static bool isArgValid(const char *arg);
+  static bool isArgValid(const char* arg);
 
   ////////////////////////////////////////////
   // isArgValid()
-  // 
+  //
   // Check if a command line arg is a valid TDRP arg.
   // return number of args consumed.
   //
 
-  static int isArgValidN(const char *arg);
+  static int isArgValidN(const char* arg);
 
   ////////////////////////////////////////////
   // load()
@@ -221,9 +221,7 @@ public:
   //  Returns 0 on success, -1 on failure.
   //
 
-  int load(const char *param_file_path,
-           char **override_list,
-           int expand_env, int debug);
+  int load(const char* param_file_path, char** override_list, int expand_env, int debug);
 
   ////////////////////////////////////////////
   // loadFromBuf()
@@ -258,11 +256,14 @@ public:
   //  Returns 0 on success, -1 on failure.
   //
 
-  int loadFromBuf(const char *param_source_str,
-                  char **override_list,
-                  const char *inbuf, int inlen,
-                  int start_line_num,
-                  int expand_env, int debug);
+  int loadFromBuf(
+      const char* param_source_str,
+      char** override_list,
+      const char* inbuf,
+      int inlen,
+      int start_line_num,
+      int expand_env,
+      int debug);
 
   ////////////////////////////////////////////
   // loadDefaults()
@@ -290,7 +291,7 @@ public:
 
   ////////////////////////////////////////////
   // print()
-  // 
+  //
   // Print params file
   //
   // The modes supported are:
@@ -302,7 +303,7 @@ public:
   //   PRINT_VERBOSE: long  + private params included
   //
 
-  void print(FILE *out, tdrp_print_mode_t mode = PRINT_NORM);
+  void print(FILE* out, tdrp_print_mode_t mode = PRINT_NORM);
 
   ////////////////////////////////////////////
   // checkAllSet()
@@ -313,7 +314,7 @@ public:
   // parameters which are not set.
   //
 
-  int checkAllSet(FILE *out);
+  int checkAllSet(FILE* out);
 
   //////////////////////////////////////////////////////////////
   // checkIsSet()
@@ -322,36 +323,33 @@ public:
   //
   //
 
-  int checkIsSet(const char *param_name);
+  int checkIsSet(const char* param_name);
 
   ////////////////////////////////////////////
   // arrayRealloc()
   //
   // Realloc 1D array.
   //
-  // If size is increased, the values from the last array 
+  // If size is increased, the values from the last array
   // entry is copied into the new space.
   //
   // Returns 0 on success, -1 on error.
   //
 
-  int arrayRealloc(const char *param_name,
-                   int new_array_n);
+  int arrayRealloc(const char* param_name, int new_array_n);
 
   ////////////////////////////////////////////
   // array2DRealloc()
   //
   // Realloc 2D array.
   //
-  // If size is increased, the values from the last array 
+  // If size is increased, the values from the last array
   // entry is copied into the new space.
   //
   // Returns 0 on success, -1 on error.
   //
 
-  int array2DRealloc(const char *param_name,
-                     int new_array_n1,
-                     int new_array_n2);
+  int array2DRealloc(const char* param_name, int new_array_n1, int new_array_n2);
 
   ////////////////////////////////////////////
   // freeAll()
@@ -368,15 +366,15 @@ public:
   // in to loadFromArgs().
   //
 
-  static void usage(ostream &out);
+  static void usage(ostream& out);
 
   ///////////////////////////
   // Data Members
   //
 
-  char _start_; // start of data region
-                // needed for zeroing out data
-                // and computing offsets
+  char _start_;  // start of data region
+                 // needed for zeroing out data
+                 // and computing offsets
 
   tdrp_bool_t debug_bgu;
 
@@ -688,80 +686,77 @@ public:
 
   tdrp_bool_t use_fractl_errors;
 
-  float *_mc_weight;
+  float* _mc_weight;
   int mc_weight_n;
 
-  float *_neumann_u_weight;
+  float* _neumann_u_weight;
   int neumann_u_weight_n;
 
-  float *_neumann_v_weight;
+  float* _neumann_v_weight;
   int neumann_v_weight_n;
 
-  float *_dirichlet_w_weight;
+  float* _dirichlet_w_weight;
   int dirichlet_w_weight_n;
 
-  float *_bg_qr_error;
+  float* _bg_qr_error;
   int bg_qr_error_n;
 
-  float *_bg_qv_error;
+  float* _bg_qv_error;
   int bg_qv_error_n;
 
-  float *_bg_rhoa_error;
+  float* _bg_rhoa_error;
   int bg_rhoa_error_n;
 
-  float *_bg_rhou_error;
+  float* _bg_rhou_error;
   int bg_rhou_error_n;
 
-  float *_bg_rhov_error;
+  float* _bg_rhov_error;
   int bg_rhov_error_n;
 
-  float *_bg_rhow_error;
+  float* _bg_rhow_error;
   int bg_rhow_error_n;
 
-  float *_bg_tempk_error;
+  float* _bg_tempk_error;
   int bg_tempk_error_n;
 
-  float *_i_filter_length;
+  float* _i_filter_length;
   int i_filter_length_n;
 
-  float *_j_filter_length;
+  float* _j_filter_length;
   int j_filter_length_n;
 
-  float *_k_filter_length;
+  float* _k_filter_length;
   int k_filter_length_n;
 
-  float *_i_spline_cutoff;
+  float* _i_spline_cutoff;
   int i_spline_cutoff_n;
 
-  float *_j_spline_cutoff;
+  float* _j_spline_cutoff;
   int j_spline_cutoff_n;
 
-  float *_k_spline_cutoff;
+  float* _k_spline_cutoff;
   int k_spline_cutoff_n;
 
-  float *_i_max_wavenumber;
+  float* _i_max_wavenumber;
   int i_max_wavenumber_n;
 
-  float *_j_max_wavenumber;
+  float* _j_max_wavenumber;
   int j_max_wavenumber_n;
 
-  float *_k_max_wavenumber;
+  float* _k_max_wavenumber;
   int k_max_wavenumber_n;
 
-  char _end_; // end of data region
-              // needed for zeroing out data
+  char _end_;  // end of data region
+               // needed for zeroing out data
 
-private:
-
+ private:
   void _init();
 
   mutable TDRPtable _table[191];
 
-  const char *_className;
+  const char* _className;
 
   bool _exitDeferred;
-
 };
 
 #endif
-

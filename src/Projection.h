@@ -18,17 +18,17 @@
 #ifndef PROJECTION_H
 #define PROJECTION_H
 
-#include <euclid/GeographicLib/TransverseMercatorExact.hpp>
-#include <euclid/GeographicLib/LambertConformalConic.hpp>
 #include "precision.h"
+
+#include <euclid/GeographicLib/LambertConformalConic.hpp>
+#include <euclid/GeographicLib/TransverseMercatorExact.hpp>
 
 class Projection
 {
-
  public:
-
   // The kind of projections we currently support
-  enum ProjectionType {
+  enum ProjectionType
+  {
     UNSET,
     TRANSVERSE_MERCATOR_EXACT,
     LAMBERT_CONFORMAL_CONIC,
@@ -39,15 +39,13 @@ class Projection
 
   // Set the projection type
   void setProjection(ProjectionType t);
-  void Forward (real lon0, real lat, real lon, real &x, real &y) const;
-  void Reverse (real lon0, real x, real y, real &lat, real &lon) const;
+  void Forward(real lon0, real lat, real lon, real &x, real &y) const;
+  void Reverse(real lon0, real x, real y, real &lat, real &lon) const;
 
  private:
-
   ProjectionType projection_type;
-  GeographicLib::TransverseMercatorExact	tm1;
-  GeographicLib::LambertConformalConic		tm2;
+  GeographicLib::TransverseMercatorExact tm1;
+  GeographicLib::LambertConformalConic tm2;
 };
 
 #endif /* PROJECTION_H */
-

@@ -1,10 +1,10 @@
 #ifndef BKGD_ADAPTER_H
 #define BKGD_ADAPTER_H
 
-#include <fstream>
 #include "datetime.h"
+#include "precision.h"  // for 'real' typedef
 
-#include "precision.h"	// for 'real' typedef
+#include <fstream>
 
 // This is an abstract class to support the multiple ways Background
 // observations can be loaded into samurai.
@@ -21,31 +21,54 @@
 
 // Adding terrain height to background reader 09/20/2021
 
-class BkgdAdapter {
-
+class BkgdAdapter
+{
  public:
-  BkgdAdapter() {};
-  virtual ~BkgdAdapter() {};
+  BkgdAdapter(){};
+  virtual ~BkgdAdapter(){};
 
-  virtual bool next(std::string &time, real &lat, real &lon, real &alt, real &u,
-		    real &v, real &w, real &t, real &qv, real &rhoa, real &qr, real &terrain_hgt) = 0;
+  virtual bool next(
+      std::string &time,
+      real &lat,
+      real &lon,
+      real &alt,
+      real &u,
+      real &v,
+      real &w,
+      real &t,
+      real &qv,
+      real &rhoa,
+      real &qr,
+      real &terrain_hgt) = 0;
   virtual bool checkTime() = 0;
 };
 
-class BkgdStream : public BkgdAdapter {
-
+class BkgdStream : public BkgdAdapter
+{
  public:
-
   BkgdStream(const char *fname);
   ~BkgdStream();
 
-  bool next(std::string &time, real &lat, real &lon, real &alt, real &u,
-	    real &v, real &w, real &t, real &qv, real &rhoa, real &qr, real &terrain_hgt);
+  bool next(
+      std::string &time,
+      real &lat,
+      real &lon,
+      real &alt,
+      real &u,
+      real &v,
+      real &w,
+      real &t,
+      real &qv,
+      real &rhoa,
+      real &qr,
+      real &terrain_hgt);
 
-  bool checkTime() { return true; };
+  bool checkTime()
+  {
+    return true;
+  };
 
  private:
-
   std::ifstream *_stream;
   bool _valid;
 };
@@ -54,33 +77,48 @@ class BkgdStream : public BkgdAdapter {
 // You need to pick a BkgdFArray, or BkgdCArray depending
 // on whether your arrays are row-major or column-major
 
-class BkgdArray : public BkgdAdapter {
-
+class BkgdArray : public BkgdAdapter
+{
  public:
-
-  BkgdArray(int nx, int ny, int nsigma,
-	    char *ctdg,		// current time group string
-	    int delta,		// model time step on coarse grid
-	    int iter,		// current iteration
-	    float *sigmas,
-	    float *latitude,	// 2d
-	    float *longitude,
-			float *terrain_Height,
-	    float *u1,		// 3d
-	    float *v1,
-	    float *w1,
-	    float *th1,
-	    float *p1);
+  BkgdArray(
+      int nx,
+      int ny,
+      int nsigma,
+      char *ctdg,  // current time group string
+      int delta,   // model time step on coarse grid
+      int iter,    // current iteration
+      float *sigmas,
+      float *latitude,  // 2d
+      float *longitude,
+      float *terrain_Height,
+      float *u1,  // 3d
+      float *v1,
+      float *w1,
+      float *th1,
+      float *p1);
   ~BkgdArray();
 
-  bool next(std::string &time, real &lat, real &lon, real &alt, real &u,
-	    real &v, real &w, real &t, real &qv, real &rhoa, real &qr, real &terrain_hgt);
-  bool checkTime() { return false; };
+  bool next(
+      std::string &time,
+      real &lat,
+      real &lon,
+      real &alt,
+      real &u,
+      real &v,
+      real &w,
+      real &t,
+      real &qv,
+      real &rhoa,
+      real &qr,
+      real &terrain_hgt);
+  bool checkTime()
+  {
+    return false;
+  };
 
  protected:
-
   virtual float item3d(float *a3d, int x, int y, int z) = 0;
-  virtual float item2d(float *a2d, int x, int y)= 0;
+  virtual float item2d(float *a2d, int x, int y) = 0;
 
   // TODO Do we need these 2?
 
@@ -88,7 +126,7 @@ class BkgdArray : public BkgdAdapter {
 
   // Time elements
 
-	datetime _obTime;
+  datetime _obTime;
 
   // 3d array dimentions
 
@@ -102,15 +140,15 @@ class BkgdArray : public BkgdAdapter {
 
   float *_lat_2d;
   float *_long_2d;
-	float *_terrainHgt_2d;
+  float *_terrainHgt_2d;
 
   // These are 3D
 
-  float* _u1_3d;
-  float* _v1_3d;
-  float* _w1_3d;
-  float* _th1_3d;
-  float* _p1_3d;
+  float *_u1_3d;
+  float *_v1_3d;
+  float *_w1_3d;
+  float *_th1_3d;
+  float *_p1_3d;
 
   // Iterator indices.
 
@@ -119,92 +157,88 @@ class BkgdArray : public BkgdAdapter {
 
 // Redefine the pointer arithmetic to deal with column-major arrays (Fortran, Julia, ...)
 
-class BkgdFArray : public BkgdArray {
-
+class BkgdFArray : public BkgdArray
+{
  public:
-
- BkgdFArray(int nx, int ny, int nsigma,
-	    char *ctdg,		// current time group string
-	    int delta,		// model time step on coarse grid
-	    int iter,		// current iteration
-	    float *sigmas,
-	    float *latitude,	// 2d
-	    float *longitude,
-			float *terrain_Height,
-	    float *u1,		// 3d
-	    float *v1,
-	    float *w1,
-	    float *th1,
-	    float *p1) : BkgdArray(nx, ny, nsigma,
-				   ctdg,
-				   delta,
-				   iter,
-				   sigmas,
-				   latitude,
-				   longitude,
-					 terrain_Height,
-				   u1,
-				   v1,
-				   w1,
-				   th1,
-				   p1) {};
+  BkgdFArray(
+      int nx,
+      int ny,
+      int nsigma,
+      char *ctdg,  // current time group string
+      int delta,   // model time step on coarse grid
+      int iter,    // current iteration
+      float *sigmas,
+      float *latitude,  // 2d
+      float *longitude,
+      float *terrain_Height,
+      float *u1,  // 3d
+      float *v1,
+      float *w1,
+      float *th1,
+      float *p1)
+      : BkgdArray(nx, ny, nsigma, ctdg, delta, iter, sigmas, latitude, longitude, terrain_Height, u1, v1, w1, th1, p1){};
 
   ~BkgdFArray();
 
-
  protected:
-
   float item3d(float *a3d, int x, int y, int z);
   float item2d(float *a2d, int x, int y);
 };
 
 // Redefine the pointer arithmetic to deal with row-major arrays (C, C++, c_float arrays from Python...)
 
-class BkgdCArray : public BkgdArray {
-
+class BkgdCArray : public BkgdArray
+{
  public:
-
- BkgdCArray(int nx, int ny, int nsigma,
-	    char *ctdg,		// current time group string
-	    int delta,		// model time step on coarse grid
-	    int iter,		// current iteration
-	    float *sigmas,
-	    float *latitude,	// 2d
-	    float *longitude,
-			float *terrain_Height,
-	    float *u1,		// 3d
-	    float *v1,
-	    float *w1,
-	    float *th1,
-	    float *p1) : BkgdArray(nx, ny, nsigma,
-				   ctdg,
-				   delta,
-				   iter,
-				   sigmas,
-				   latitude,
-				   longitude,
-					 terrain_Height,
-				   u1,
-				   v1,
-				   w1,
-				   th1,
-				   p1) {};
+  BkgdCArray(
+      int nx,
+      int ny,
+      int nsigma,
+      char *ctdg,  // current time group string
+      int delta,   // model time step on coarse grid
+      int iter,    // current iteration
+      float *sigmas,
+      float *latitude,  // 2d
+      float *longitude,
+      float *terrain_Height,
+      float *u1,  // 3d
+      float *v1,
+      float *w1,
+      float *th1,
+      float *p1)
+      : BkgdArray(nx, ny, nsigma, ctdg, delta, iter, sigmas, latitude, longitude, terrain_Height, u1, v1, w1, th1, p1){};
 
   ~BkgdCArray();
 
-
  protected:
-
   float item3d(float *a3d, int x, int y, int z);
   float item2d(float *a2d, int x, int y);
 };
 
 // Place holder for Fractl input
 // Fractl doesn't have terrain height, and the time should be int rather than string. Make the compiler work for now.
-class BkgdFractl : public BkgdAdapter {
-  bool next(std::string &time, real &lat, real &lon, real &alt, real &u,
-	    real &v, real &w, real &t, real &qv, real &rhoa, real &qr, real &terrain_hgt) { return true;};
-  bool checkTime() { return true; };
+class BkgdFractl : public BkgdAdapter
+{
+  bool next(
+      std::string &time,
+      real &lat,
+      real &lon,
+      real &alt,
+      real &u,
+      real &v,
+      real &w,
+      real &t,
+      real &qv,
+      real &rhoa,
+      real &qr,
+      real &terrain_hgt)
+  {
+    return true;
+  };
+  bool checkTime()
+  {
+    return true;
+  };
 };
 
 #endif

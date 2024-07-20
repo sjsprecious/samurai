@@ -1,8 +1,8 @@
 #ifndef FILELIST_H_
 #define FILELIST_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 std::vector<std::string> FileList(std::string &path_in);
 
@@ -12,4 +12,4 @@ std::string Extension(std::string);
 // Check if a directory exists:
 bool DirectoryExists(std::string);
 
-#endif // FILELIST_H_
+#endif  // FILELIST_H_

@@ -1,18 +1,17 @@
 #include "Args.h"
 
 #include <cstdarg>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <unordered_set>
 
 //#include <regex>
 
 bool Args::parseArgs(int argc, char *argv[])
 {
-
   bool ret_val = true;
-  
-  std::unordered_set<std::string> keywordSet ( { } );
+
+  std::unordered_set<std::string> keywordSet({});
 
   tdrp_override_t override;
   TDRP_init_override(&override);
@@ -21,31 +20,34 @@ bool Args::parseArgs(int argc, char *argv[])
 
   // Fill override from command line arguments
 
-  for (int i = 1; i < argc; i++) {
-    if ( !strcmp(argv[i], "--") ||
-	 !strcmp(argv[i], "-h") ||
-	 !strcmp(argv[i], "-help") ||
-	 !strcmp(argv[i], "-man")) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (!strcmp(argv[i], "--") || !strcmp(argv[i], "-h") || !strcmp(argv[i], "-help") || !strcmp(argv[i], "-man"))
+    {
       params.usage(std::cout);
-      exit (0);
+      exit(0);
     }
     const char *arg = argv[i] + 1;
     std::unordered_set<std::string>::const_iterator found = keywordSet.find(arg);
-    if ( found != keywordSet.end() ) {
+    if (found != keywordSet.end())
+    {
       sprintf(tmp_str, "%s = %s;", arg, argv[++i]);
-      TDRP_add_override(&override, tmp_str);      
-    } else {
+      TDRP_add_override(&override, tmp_str);
+    }
+    else
+    {
       // This one has specific meaning to TDRP.
-      if ( ! strcmp(argv[i], "-params" ) )
-	i++;
+      if (!strcmp(argv[i], "-params"))
+        i++;
     }
   }
 
   // Now parse the config file
-  
+
   char *paramsPath;
-  
-  if (params.loadFromArgs(argc, argv, override.list, &paramsPath)) {
+
+  if (params.loadFromArgs(argc, argv, override.list, &paramsPath))
+  {
     std::cout << "Problem with command line args" << std::endl;
     ret_val = false;
   }
@@ -55,16 +57,15 @@ bool Args::parseArgs(int argc, char *argv[])
   return ret_val;
 }
 
-
 // Fill the given configHash with the data from the params object
 #define STR_HELPER(_X_) std::string(#_X_)
-#define STR(_X_) STR_HELPER(_X_)
+#define STR(_X_)        STR_HELPER(_X_)
 
-#define CONFIG_INSERT_BOOL(_X_) configHash->insert(#_X_, params._X_ ? "true" : "false")
-#define CONFIG_INSERT_INT(_X_) configHash->insert(#_X_, std::to_string(params._X_))
+#define CONFIG_INSERT_BOOL(_X_)  configHash->insert(#_X_, params._X_ ? "true" : "false")
+#define CONFIG_INSERT_INT(_X_)   configHash->insert(#_X_, std::to_string(params._X_))
 #define CONFIG_INSERT_FLOAT(_X_) configHash->insert(#_X_, std::to_string(params._X_))
-#define CONFIG_INSERT_STR(_X_) configHash->insert(#_X_, params._X_)
-#define CONFIG_INSERT_FLOAT_ARRAY(zZz, _iter_) \
+#define CONFIG_INSERT_STR(_X_)   configHash->insert(#_X_, params._X_)
+#define CONFIG_INSERT_FLOAT_ARRAY(zZz, _iter_)                                                          \
   configHash->insert(STR(zZz) + "_" + std::to_string(iter), std::to_string(params._##zZz[_iter_ - 1])); \
   configHash->insert(#zZz, std::to_string(params._##zZz[0]))
 
@@ -80,11 +81,10 @@ std::string mode_map[] = { "XYZ", "RTZ" };
 
 // This needs to match projection_t in paramdef.samurai
 
-std::string projection_map[] = { "lambert_conformal_conic",
-			     "transverse_mercator_exact" };
+std::string projection_map[] = { "lambert_conformal_conic", "transverse_mercator_exact" };
 
-bool Args::paramsToHash(HashMap *configHash) {
-
+bool Args::paramsToHash(HashMap *configHash)
+{
   // string arguments
 
   CONFIG_INSERT_BOOL(adjust_background);
@@ -118,7 +118,7 @@ bool Args::paramsToHash(HashMap *configHash) {
   CONFIG_INSERT_STR(ref_state);
   CONFIG_INSERT_BOOL(save_mish);
   CONFIG_INSERT_BOOL(use_fractl_errors);
-  
+
   // int arguments
 
   CONFIG_INSERT_INT(bkgd_kd_num_neighbors);
@@ -172,7 +172,7 @@ bool Args::paramsToHash(HashMap *configHash) {
   CONFIG_INSERT_STR(k_rhow_bcR);
   CONFIG_INSERT_STR(k_tempk_bcL);
   CONFIG_INSERT_STR(k_tempk_bcR);
-  
+
   // float arguments
 
   CONFIG_INSERT_FLOAT(aeri_qv_error);
@@ -253,7 +253,7 @@ bool Args::paramsToHash(HashMap *configHash) {
   CONFIG_INSERT_FLOAT(k_max_wavenumber_rhov);
   CONFIG_INSERT_FLOAT(k_max_wavenumber_rhow);
   CONFIG_INSERT_FLOAT(k_max_wavenumber_tempk);
-#endif  
+#endif
   CONFIG_INSERT_FLOAT(k_min);
   CONFIG_INSERT_FLOAT(k_reflectivity_roi);
   // CONFIG_INSERT_FLOAT(k_spline_cutoff);
@@ -281,7 +281,8 @@ bool Args::paramsToHash(HashMap *configHash) {
   CONFIG_INSERT_FLOAT(rain_dbz);
   CONFIG_INSERT_FLOAT(sfmr_windspeed_error);
 
-  for (int iter = 1; iter <= params.num_iterations; iter++) {
+  for (int iter = 1; iter <= params.num_iterations; iter++)
+  {
     CONFIG_INSERT_FLOAT_ARRAY(bg_qr_error, iter);
     CONFIG_INSERT_FLOAT_ARRAY(bg_rhoa_error, iter);
     CONFIG_INSERT_FLOAT_ARRAY(bg_rhou_error, iter);
@@ -295,7 +296,7 @@ bool Args::paramsToHash(HashMap *configHash) {
     CONFIG_INSERT_FLOAT_ARRAY(k_filter_length, iter);
     CONFIG_INSERT_FLOAT_ARRAY(i_spline_cutoff, iter);
     CONFIG_INSERT_FLOAT_ARRAY(j_spline_cutoff, iter);
-    CONFIG_INSERT_FLOAT_ARRAY(k_spline_cutoff, iter);    
+    CONFIG_INSERT_FLOAT_ARRAY(k_spline_cutoff, iter);
     CONFIG_INSERT_FLOAT_ARRAY(i_max_wavenumber, iter);
     CONFIG_INSERT_FLOAT_ARRAY(j_max_wavenumber, iter);
     CONFIG_INSERT_FLOAT_ARRAY(mc_weight, iter);

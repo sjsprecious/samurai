@@ -40,20 +40,21 @@
  * this file.  See BSplineBase class documentation for more info.
  */
 #if WIN32
-# ifndef BSPLINE_DLL_
-#  define BSPLINE_DLL_ __declspec(dllimport)
-# endif
+  #ifndef BSPLINE_DLL_
+    #define BSPLINE_DLL_ __declspec(dllimport)
+  #endif
 #else
-# define BSPLINE_DLL_
+  #define BSPLINE_DLL_
 #endif /* WIN32 */
 
-
-template <class T> class BSpline;
+template<class T>
+class BSpline;
 
 /*
  * Opaque member structure to hide the matrix implementation.
  */
-template <class T> struct BSplineBaseP;
+template<class T>
+struct BSplineBaseP;
 
 /**
  * @class BSplineBase
@@ -95,12 +96,12 @@ template <class T> struct BSplineBaseP;
     if (spline.ok())
     {
         ostream_iterator<float> of(cout, "\t ");
-    	float xi = spline.Xmin();
-	float xs = (spline.Xmax() - xi) / 2000.0;
-	for (; xi <= spline.Xmax(); xi += xs)
-	{
-	    *of++ = spline.evaluate (xi);
-	}
+        float xi = spline.Xmin();
+        float xs = (spline.Xmax() - xi) / 2000.0;
+        for (; xi <= spline.Xmax(); xi += xs)
+        {
+            *of++ = spline.evaluate (xi);
+        }
     }
 
 @endverbatim
@@ -186,316 +187,326 @@ Copyright (c) 1998-2005
 University Corporation for Atmospheric Research, UCAR
 @endverbatim
  **/
-template <class T>
+template<class T>
 class BSPLINE_DLL_ BSplineBase
 {
-public:
-    // Datum type
-    typedef T datum_type;
+ public:
+  // Datum type
+  typedef T datum_type;
 
-    /// Return a string describing the implementation version.
-    static const char *ImplVersion();
+  /// Return a string describing the implementation version.
+  static const char *ImplVersion();
 
-    /// Return a string describing the interface version.
-    static const char *IfaceVersion();
+  /// Return a string describing the interface version.
+  static const char *IfaceVersion();
 
-    /**
-     * Call this class method with a value greater than zero to enable
-     * debug messages, or with zero to disable messages.  Calling with
-     * no arguments returns true if debugging enabled, else false.
-     */
-    static bool Debug (int on = -1);
+  /**
+   * Call this class method with a value greater than zero to enable
+   * debug messages, or with zero to disable messages.  Calling with
+   * no arguments returns true if debugging enabled, else false.
+   */
+  static bool Debug(int on = -1);
 
-    /**
-     * Boundary condition types.
-     */
-    enum BoundaryConditionTypes
-    {
-	/// Set the endpoints of the spline to zero.
-	BC_ZERO_ENDPOINTS = 0,
-	/// Set the first derivative of the spline to zero at the endpoints.
-	BC_ZERO_FIRST = 1,
-	/// Set the second derivative to zero.
-	BC_ZERO_SECOND = 2,
-	// Left 0, Right 1
-	BC_LZERO_RFIRST = 3,
-	// Left 0, Right 2
-	BC_LZERO_RSECOND = 4,
-	// Left 1, Right 0
-	BC_LFIRST_RZERO = 5,
-	// Left 1, Right 2
-	BC_LFIRST_RSECOND = 6,
-	// Left 2, Right 0
-	BC_LSECOND_RZERO = 7,
-	// Left 2, Right 1
-	BC_LSECOND_RFIRST = 8
-    };
+  /**
+   * Boundary condition types.
+   */
+  enum BoundaryConditionTypes
+  {
+    /// Set the endpoints of the spline to zero.
+    BC_ZERO_ENDPOINTS = 0,
+    /// Set the first derivative of the spline to zero at the endpoints.
+    BC_ZERO_FIRST = 1,
+    /// Set the second derivative to zero.
+    BC_ZERO_SECOND = 2,
+    // Left 0, Right 1
+    BC_LZERO_RFIRST = 3,
+    // Left 0, Right 2
+    BC_LZERO_RSECOND = 4,
+    // Left 1, Right 0
+    BC_LFIRST_RZERO = 5,
+    // Left 1, Right 2
+    BC_LFIRST_RSECOND = 6,
+    // Left 2, Right 0
+    BC_LSECOND_RZERO = 7,
+    // Left 2, Right 1
+    BC_LSECOND_RFIRST = 8
+  };
 
-public:
+ public:
+  /**
+   * Construct a spline domain for the given set of x values, cutoff
+   * wavelength, and boundary condition type.  The parameters are the
+   * same as for setDomain().  Call ok() to check whether domain
+   * setup succeeded after construction.
+   */
+  BSplineBase(const T *x, int nx, real wl, int bc_type = BC_ZERO_SECOND, int num_nodes = 0);
 
-    /**
-     * Construct a spline domain for the given set of x values, cutoff
-     * wavelength, and boundary condition type.  The parameters are the
-     * same as for setDomain().  Call ok() to check whether domain
-     * setup succeeded after construction.
-     */
-    BSplineBase (const T *x, int nx,
-		 real wl, int bc_type = BC_ZERO_SECOND,
-		 int num_nodes = 0);
+  /// Copy constructor
+  BSplineBase(const BSplineBase &);
 
-    /// Copy constructor
-    BSplineBase (const BSplineBase &);
+  /**
+   * Change the domain of this base.  [If this is part of a BSpline
+   * object, this method {\em will not} change the existing curve or
+   * re-apply the smoothing to any set of y values.]
+   *
+   * The x values can be in any order, but they must be of sufficient
+   * density to support the requested cutoff wavelength.  The setup of
+   * the domain may fail because of either inconsistency between the x
+   * density and the cutoff wavelength, or because the resulting matrix
+   * could not be factored.  If setup fails, the method returns false.
+   *
+   * @param x		The array of x values in the domain.
+   * @param nx	The number of values in the @p x array.
+   * @param wl	The cutoff wavelength, in the same units as the
+   *			@p x values.  A wavelength of zero disables
+   *			the derivative constraint.
+   * @param bc_type	The enumerated boundary condition type.  If
+   *			omitted it defaults to BC_ZERO_SECOND.
+   * @param num_nodes The number of nodes to use for the cubic b-spline.
+   *			If less than 2 a reasonable number will be
+   *			calculated automatically, if possible, taking
+   * 			into account the given cutoff wavelength.
+   *
+   * @see ok().
+   */
+  bool setDomain(const T *x, int nx, real wl, int bc_type = BC_ZERO_SECOND, int num_nodes = 0);
+  bool setDomainGQ(const T *x, int nx, real wl, int bc_type = BC_ZERO_SECOND, int num_nodes = 0);
+  /**
+   * Create a BSpline smoothed curve for the given set of NX y values.
+   * The returned object will need to be deleted by the caller.
+   * @param y The array of y values corresponding to each of the nX()
+   *		x values in the domain.
+   * @see ok()
+   */
+  BSpline<T> *apply(const T *y);
 
-    /**
-     * Change the domain of this base.  [If this is part of a BSpline
-     * object, this method {\em will not} change the existing curve or
-     * re-apply the smoothing to any set of y values.]
-     *
-     * The x values can be in any order, but they must be of sufficient
-     * density to support the requested cutoff wavelength.  The setup of
-     * the domain may fail because of either inconsistency between the x
-     * density and the cutoff wavelength, or because the resulting matrix
-     * could not be factored.  If setup fails, the method returns false.
-     *
-     * @param x		The array of x values in the domain.
-     * @param nx	The number of values in the @p x array.
-     * @param wl	The cutoff wavelength, in the same units as the
-     *			@p x values.  A wavelength of zero disables
-     *			the derivative constraint.
-     * @param bc_type	The enumerated boundary condition type.  If
-     *			omitted it defaults to BC_ZERO_SECOND.
-     * @param num_nodes The number of nodes to use for the cubic b-spline.
-     *			If less than 2 a reasonable number will be
-     *			calculated automatically, if possible, taking
-     * 			into account the given cutoff wavelength.
-     *
-     * @see ok().
-     */
-    bool setDomain (const T *x, int nx, real wl,
-		    int bc_type = BC_ZERO_SECOND,
-		    int num_nodes = 0);
-    bool setDomainGQ (const T *x, int nx, real wl,
-					int bc_type = BC_ZERO_SECOND,
-					int num_nodes = 0);
-    /**
-     * Create a BSpline smoothed curve for the given set of NX y values.
-     * The returned object will need to be deleted by the caller.
-     * @param y The array of y values corresponding to each of the nX()
-     *		x values in the domain.
-     * @see ok()
-     */
-    BSpline<T> *apply (const T *y);
+  /**
+   * Return array of the node coordinates.  Returns 0 if not ok().  The
+   * array of nodes returned by nodes() belongs to the object and should
+   * not be deleted; it will also be invalid if the object is destroyed.
+   */
+  const T *nodes(int *nnodes);
 
-    /**
-     * Return array of the node coordinates.  Returns 0 if not ok().  The
-     * array of nodes returned by nodes() belongs to the object and should
-     * not be deleted; it will also be invalid if the object is destroyed.
-     */
-    const T *nodes (int *nnodes);
+  /**
+   * Return the number of nodes (one more than the number of intervals).
+   */
+  int nNodes()
+  {
+    return M + 1;
+  }
 
-    /**
-     * Return the number of nodes (one more than the number of intervals).
-     */
-    int nNodes () { return M+1; }
+  /**
+   * Number of original x values.
+   */
+  int nX()
+  {
+    return NX;
+  }
 
-    /**
-     * Number of original x values.
-     */
-    int nX () { return NX; }
+  /// Minimum x value found.
+  T Xmin()
+  {
+    return xmin;
+  }
 
-    /// Minimum x value found.
-    T Xmin () { return xmin; }
+  /// Maximum x value found.
+  T Xmax()
+  {
+    return xmin + (M * DX);
+  }
 
-    /// Maximum x value found.
-    T Xmax () { return xmin + (M * DX); }
+  /**
+   * Return the Alpha value for a given wavelength.  Note that this
+   * depends on the current node interval length (DX).
+   */
+  real Alpha(real wavelength);
+  real AlphaGQ(real wavelength);
+  /**
+   * Return alpha currently in use by this domain.
+   */
+  real Alpha()
+  {
+    return alpha;
+  }
 
-    /**
-     * Return the Alpha value for a given wavelength.  Note that this
-     * depends on the current node interval length (DX).
-     */
-    real Alpha (real wavelength);
-	real AlphaGQ (real wavelength);
-    /**
-     * Return alpha currently in use by this domain.
-     */
-    real Alpha () { return alpha; }
+  /**
+   * Return the current state of the object, either ok or not ok.
+   * Use this method to test for valid state after construction or after
+   * a call to setDomain().  ok() will return false if either fail, such
+   * as when an appropriate number of nodes and node interval cannot be
+   * found for a given wavelength, or when the linear equation for the
+   * coefficients cannot be solved.
+   */
+  bool ok()
+  {
+    return OK;
+  }
 
-    /**
-     * Return the current state of the object, either ok or not ok.
-     * Use this method to test for valid state after construction or after
-     * a call to setDomain().  ok() will return false if either fail, such
-     * as when an appropriate number of nodes and node interval cannot be
-     * found for a given wavelength, or when the linear equation for the
-     * coefficients cannot be solved.
-     */
-    bool ok () { return OK; }
+  virtual ~BSplineBase();
 
-    virtual ~BSplineBase();
+ protected:
+  typedef BSplineBaseP<T> Base;
 
-protected:
+  // Provided
+  real waveLength;  // Cutoff wavelength (l sub c)
+  int NX;
+  int K;   // Degree of derivative constraint (currently fixed at 2)
+  int BC;  // Boundary conditions type (0,1,2)
 
-    typedef BSplineBaseP<T> Base;
+  // Derived
+  T xmax;
+  T xmin;
+  int M;    // Number of intervals (M+1 nodes)
+  real DX;  // Interval length in same units as X
+  real DXrecip;
+  real alpha;
+  bool OK;
+  Base *base;  // Hide more complicated state members
+               // from the public interface.
 
-    // Provided
-    real waveLength;	// Cutoff wavelength (l sub c)
-    int NX;
-    int K;	// Degree of derivative constraint (currently fixed at 2)
-    int BC;			// Boundary conditions type (0,1,2)
+  bool Setup(int num_nodes = 0);
+  bool SetupGQ(int num_nodes = 0);
+  void calculateQ();
+  real qDelta(int m1, int m2);
+  real Beta(/* unsigned */ int m);
+  void addP();
+  void addPGQ();
+  bool factor();
+  real Basis(int m, T x);
+  real DBasis(int m, T x);
 
-    // Derived
-    T xmax;
-    T xmin;
-    int M;			// Number of intervals (M+1 nodes)
-    real DX;			// Interval length in same units as X
-	real DXrecip;
-    real alpha;
-    bool OK;
-    Base *base;			// Hide more complicated state members
-    				// from the public interface.
+  static const real BoundaryConditions[9][4];
+  static const real PI;
+  static const real ONESIXTH;
 
-    bool Setup (int num_nodes = 0);
-	bool SetupGQ (int num_nodes = 0);
-    void calculateQ ();
-    real qDelta (int m1, int m2);
-    real Beta (/* unsigned */ int m);
-    void addP ();
-	void addPGQ ();
-    bool factor ();
-    real Basis (int m, T x);
-    real DBasis (int m, T x);
-
-    static const real BoundaryConditions[9][4];
-    static const real PI;
-	static const real ONESIXTH;
-
-    real Ratiod (int&, real &, real &);
+  real Ratiod(int &, real &, real &);
 };
 
-
-template <class T> struct BSplineP;
-
+template<class T>
+struct BSplineP;
 
 /**
  * Inherit the BSplineBase domain information and interface and add
  * smoothing.  See the BSplineBase documentation for a summary of the
  * BSpline interface.
  */
-template <class T>
+template<class T>
 class BSPLINE_DLL_ BSpline : public BSplineBase<T>
 {
-public:
-    /**
-     * Create a single spline with the parameters required to set up
-     * the domain and subsequently smooth the given set of y values.
-     * The y values must correspond to each of the values in the x array.
-     * If either the domain setup fails or the spline cannot be solved,
-     * the state will be set to not ok.
-     *
-     * @see ok().
-     *
-     * @param x		The array of x values in the domain.
-     * @param nx	The number of values in the @p x array.
-     * @param y		The array of y values corresponding to each of the
-     *			nX() x values in the domain.
-     * @param wl	The cutoff wavelength, in the same units as the
-     *			@p x values.  A wavelength of zero disables
-     *			the derivative constraint.
-     * @param bc_type	The enumerated boundary condition type.  If
-     *			omitted it defaults to BC_ZERO_SECOND.
-     * @param num_nodes The number of nodes to use for the cubic b-spline.
-     *			If less than 2 a "reasonable" number will be
-     *			calculated automatically, taking into account
-     *			the given cutoff wavelength.
-     */
-    BSpline (const T *x, int nx, 		/* independent variable */
-	     const T *y,			/* dependent values @ ea X */
-	     real wl,				/* cutoff wavelength */
-	     int bc_type = BSplineBase<T>::BC_ZERO_SECOND,
-	     int num_nodes = 0);
+ public:
+  /**
+   * Create a single spline with the parameters required to set up
+   * the domain and subsequently smooth the given set of y values.
+   * The y values must correspond to each of the values in the x array.
+   * If either the domain setup fails or the spline cannot be solved,
+   * the state will be set to not ok.
+   *
+   * @see ok().
+   *
+   * @param x		The array of x values in the domain.
+   * @param nx	The number of values in the @p x array.
+   * @param y		The array of y values corresponding to each of the
+   *			nX() x values in the domain.
+   * @param wl	The cutoff wavelength, in the same units as the
+   *			@p x values.  A wavelength of zero disables
+   *			the derivative constraint.
+   * @param bc_type	The enumerated boundary condition type.  If
+   *			omitted it defaults to BC_ZERO_SECOND.
+   * @param num_nodes The number of nodes to use for the cubic b-spline.
+   *			If less than 2 a "reasonable" number will be
+   *			calculated automatically, taking into account
+   *			the given cutoff wavelength.
+   */
+  BSpline(
+      const T *x,
+      int nx,     /* independent variable */
+      const T *y, /* dependent values @ ea X */
+      real wl,    /* cutoff wavelength */
+      int bc_type = BSplineBase<T>::BC_ZERO_SECOND,
+      int num_nodes = 0);
 
-    /**
-     * A BSpline curve can be derived from a separate @p base and a set
-     * of data points @p y over that base.
-     */
-    BSpline (BSplineBase<T> &base, const T *y);
+  /**
+   * A BSpline curve can be derived from a separate @p base and a set
+   * of data points @p y over that base.
+   */
+  BSpline(BSplineBase<T> &base, const T *y);
 
-	/**
-	 * A default, empty BSpline object
-	 */
-	BSpline ();
+  /**
+   * A default, empty BSpline object
+   */
+  BSpline();
 
-    /**
-     * Solve the spline curve for a new set of y values.  Returns false
-     * if the solution fails.
-     *
-     * @param y The array of y values corresponding to each of the nX()
-     *		x values in the domain.
-     */
-    bool solve (const T *y);
-	bool solveGQ (const T *y);
-	bool solveBGQ (const T *b);
-	const T *solveInverseGQ(const T* b);
-    /**
-     * Return the entire curve evaluated at each of the nodes.
-     * The array is held by the object, and thus should not be freed and
-     * is only valid while the object exists.
-     * If the current state is not ok(), the method returns zero.
-     *
-     * @param nx  If non-zero, returns the number of points in the curve.
-     */
-    const T *curve (int *nx = 0);
+  /**
+   * Solve the spline curve for a new set of y values.  Returns false
+   * if the solution fails.
+   *
+   * @param y The array of y values corresponding to each of the nX()
+   *		x values in the domain.
+   */
+  bool solve(const T *y);
+  bool solveGQ(const T *y);
+  bool solveBGQ(const T *b);
+  const T *solveInverseGQ(const T *b);
+  /**
+   * Return the entire curve evaluated at each of the nodes.
+   * The array is held by the object, and thus should not be freed and
+   * is only valid while the object exists.
+   * If the current state is not ok(), the method returns zero.
+   *
+   * @param nx  If non-zero, returns the number of points in the curve.
+   */
+  const T *curve(int *nx = 0);
 
-    /**
-     * Return the evaluation of the smoothed curve
-     * at a particular @p x value.  If current state is not ok(), returns 0.
-     */
-    T evaluate (T x);
+  /**
+   * Return the evaluation of the smoothed curve
+   * at a particular @p x value.  If current state is not ok(), returns 0.
+   */
+  T evaluate(T x);
 
-    /**
-     * Return the first derivative of the spline curve at the given @p x.
-     * Returns zero if the current state is not ok().
-     */
-    T slope (T x);
+  /**
+   * Return the first derivative of the spline curve at the given @p x.
+   * Returns zero if the current state is not ok().
+   */
+  T slope(T x);
 
-    /**
-     * Return the @p n-th basis coefficient, from 0 to M.  If the current
-     * state is not ok(), or @p n is out of range, the method returns zero.
-     */
-    T getCoefficient (int n);
+  /**
+   * Return the @p n-th basis coefficient, from 0 to M.  If the current
+   * state is not ok(), or @p n is out of range, the method returns zero.
+   */
+  T getCoefficient(int n);
 
-	/**
-     * Set the @p n-th basis coefficient, from 0 to M.  If the current
-     * state is not ok(), or @p n is out of range, the method returns zero.
-     */
-    bool setCoefficient (int n, T coeff);
+  /**
+   * Set the @p n-th basis coefficient, from 0 to M.  If the current
+   * state is not ok(), or @p n is out of range, the method returns zero.
+   */
+  bool setCoefficient(int n, T coeff);
 
-	/* Return the basis or derivative evaluated at that node */
-	T getBasis(int n, T x);
-	T getDBasis(int n, T x);
+  /* Return the basis or derivative evaluated at that node */
+  T getBasis(int n, T x);
+  T getDBasis(int n, T x);
 
-	/* Return the nodal representation (b) on a Gaussian grid */
-	const T *getBGQ(const T *y);
+  /* Return the nodal representation (b) on a Gaussian grid */
+  const T *getBGQ(const T *y);
 
-	const T *getQfactored();
+  const T *getQfactored();
 
-    virtual ~BSpline();
+  virtual ~BSpline();
 
-    using BSplineBase<T>::Debug;
+  using BSplineBase<T>::Debug;
 
-protected:
+ protected:
+  using BSplineBase<T>::OK;
+  using BSplineBase<T>::M;
+  using BSplineBase<T>::NX;
+  using BSplineBase<T>::DX;
+  using BSplineBase<T>::base;
+  using BSplineBase<T>::xmin;
+  using BSplineBase<T>::xmax;
 
-    using BSplineBase<T>::OK;
-    using BSplineBase<T>::M;
-    using BSplineBase<T>::NX;
-    using BSplineBase<T>::DX;
-    using BSplineBase<T>::base;
-    using BSplineBase<T>::xmin;
-    using BSplineBase<T>::xmax;
-
-    // Our hidden state structure
-    BSplineP<T> *s;
-    T mean;			// Fit without mean and add it in later
-	T* q;
+  // Our hidden state structure
+  BSplineP<T> *s;
+  T mean;  // Fit without mean and add it in later
+  T *q;
 };
 
-#endif // !defined _BSPLINEBASE_IFACE_ID
+#endif  // !defined _BSPLINEBASE_IFACE_ID

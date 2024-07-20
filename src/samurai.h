@@ -3,13 +3,14 @@
 #ifndef SAMURAI_CONFIG_H
 #define SAMURAI_CONFIG_H
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
-struct samurai_config {
+struct samurai_config
+{
   // operation
   int num_iterations;
-  
+
   // radar
   int radar_skip;
   int radar_stride;
@@ -36,7 +37,7 @@ struct samurai_config {
   float k_max;
   float k_incr;
 #endif /* now comes from run call */
-  
+
   // background
   float i_background_roi;
   float j_background_roi;
@@ -49,7 +50,6 @@ struct samurai_config {
   float melting_zone_width;
   float mixed_phase_dbz;
   float rain_dbz;
-
 
   // parameters iter 1
   float bg_rhou_error;
@@ -111,7 +111,7 @@ struct samurai_config {
   float delx;
   float dely;
 #endif
-  
+
   // operation
   unsigned char load_background;
   unsigned char adjust_background;
@@ -167,9 +167,9 @@ struct samurai_config {
   char k_qr_bcL[3];
   char k_qr_bcR[3];
 
-  // operation   
+  // operation
   char mode[4];
-  
+
   // radar
   char qr_variable[4];
   char radar_dbz[4];
@@ -183,7 +183,7 @@ struct samurai_config {
   // background
   char ref_time[9];
 #endif
-  
+
   // background
   char ref_state[14];
 
@@ -197,14 +197,15 @@ struct samurai_config {
 
 // C API to the Samurai Driver3d
 
-extern "C" {
+extern "C"
+{
   class VarDriver3D;
 
   // Constructors
-  
-  VarDriver3D *create_vardriver3D(const samurai_config *config, bool fixedGrid= true);
+
+  VarDriver3D *create_vardriver3D(const samurai_config *config, bool fixedGrid = true);
   VarDriver3D *create_vardriver3D_From_File(const char *config_path, bool fixedGrid = true);
-  
+
   // Destructor
   void delete_vardriver3D(VarDriver3D *d);
 
@@ -212,43 +213,48 @@ extern "C" {
   int initialize_vardriver3D();
 
   // Run the analysis
-  int run_vardriver3D(VarDriver3D *d,
-		      // These are input values
-		      int nx, int ny, int nsigma,
-		      // ----- new -----
-		      char cdtg[10],	// "12Z oct 4 2015 -> "2015100412"
-		      int delta,	// delta * iter1 past cdtg
-		      int iter1,
-		      float imin, float imax, float iincr, // used to come from config
-		      float jmin, float jmax, float jincr,
-		      // ----- new -----
-		      
-		      float *sigmas,	// 2D array (nsigma)
-		      float *latitude,	// 2D array (nx, ny)
-		      float *longitude,	// 2D array
-		      float *u1,	// 3D array (nx, ny, nsigma)  
-		      float *v1,	// 3D array
-		      float *w1,	// 3D array
-		      float *th1,	// 3D array
-		      float *p1,	// 3D array
+  int run_vardriver3D(
+      VarDriver3D *d,
+      // These are input values
+      int nx,
+      int ny,
+      int nsigma,
+      // ----- new -----
+      char cdtg[10],  // "12Z oct 4 2015 -> "2015100412"
+      int delta,      // delta * iter1 past cdtg
+      int iter1,
+      float imin,
+      float imax,
+      float iincr,  // used to come from config
+      float jmin,
+      float jmax,
+      float jincr,
+      // ----- new -----
 
-		      // These are output values
-		      float *usam,	// 3D array
-		      float *vsam,	// 3D array
-		      float *wsam,	// 3D array
-		      float *thsam,	// 3D array
-		      float *psam	// 3D array
-		      );
-  
+      float *sigmas,     // 2D array (nsigma)
+      float *latitude,   // 2D array (nx, ny)
+      float *longitude,  // 2D array
+      float *u1,         // 3D array (nx, ny, nsigma)
+      float *v1,         // 3D array
+      float *w1,         // 3D array
+      float *th1,        // 3D array
+      float *p1,         // 3D array
+
+      // These are output values
+      float *usam,   // 3D array
+      float *vsam,   // 3D array
+      float *wsam,   // 3D array
+      float *thsam,  // 3D array
+      float *psam    // 3D array
+  );
+
   // centers vector manipulation
-  
+
   void clear_centers(VarDriver3D *d);
-  
+
   void pop_center(VarDriver3D *d);
 
-  void append_center(VarDriver3D *d, char *date, char *time,
-		     float lat, float lon,
-		     float vm, float um);
+  void append_center(VarDriver3D *d, char *date, char *time, float lat, float lon, float vm, float um);
 
   // debug stuff
   void dump_hash(HashMap &hash);
