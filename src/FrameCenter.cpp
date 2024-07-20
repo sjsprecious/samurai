@@ -10,21 +10,21 @@
 
 FrameCenter::FrameCenter()
 {
-	latitude = -999;
-	longitude = -999;
-	Um = -999;
-	Vm = -999;
-	char const* zero = "00000101";
-	time = ParseDate(zero, "%Y%m%d");
+  latitude = -999;
+  longitude = -999;
+  Um = -999;
+  Vm = -999;
+  char const* zero = "00000101";
+  time = ParseDate(zero, "%Y%m%d");
 }
 
 FrameCenter::FrameCenter(datetime& t, float lat, float lon, float u, float v)
 {
-	time = t;
-	latitude = lat;
-	longitude = lon;
-	Um = u;
-	Vm = v;
+  time = t;
+  latitude = lat;
+  longitude = lon;
+  Um = u;
+  Vm = v;
 }
 
 FrameCenter::~FrameCenter()
@@ -33,51 +33,50 @@ FrameCenter::~FrameCenter()
 
 float FrameCenter::getLat() const
 {
-	return latitude;
+  return latitude;
 }
 
 void FrameCenter::setLat(const float& lat)
 {
-	latitude = lat;
+  latitude = lat;
 }
-
 
 float FrameCenter::getLon() const
 {
-	return longitude;
+  return longitude;
 }
 
 void FrameCenter::setLon(const float& lon)
 {
-	longitude = lon;
+  longitude = lon;
 }
 
 datetime FrameCenter::getTime() const
 {
-	return time;
+  return time;
 }
 
 void FrameCenter::setTime(const datetime& obTime)
 {
-	time = datetime(obTime);
+  time = datetime(obTime);
 }
 
-float  FrameCenter::getUmean() const
+float FrameCenter::getUmean() const
 {
-	return Um;
+  return Um;
 }
 
-void  FrameCenter::setUmean(const float& u)
+void FrameCenter::setUmean(const float& u)
 {
-	Um = u;
+  Um = u;
 }
 
-float  FrameCenter::getVmean() const
+float FrameCenter::getVmean() const
 {
-	return Vm;
+  return Vm;
 }
 
-void  FrameCenter::setVmean(const float& v)
+void FrameCenter::setVmean(const float& v)
 {
-	Vm = v;
+  Vm = v;
 }

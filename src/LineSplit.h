@@ -6,4 +6,4 @@
 
 std::vector<std::string> LineSplit(const std::string& in, const char delim);
 
-#endif // LINESPLIT_H_
+#endif  // LINESPLIT_H_
