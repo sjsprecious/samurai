@@ -123,8 +123,8 @@ bool VarDriver::readFrameCenters()
     int hours = std::stoi(timestr.substr(0, 2));
     if (hours > 23)
     {  // (FIXME : NCAR) The original code added a day here, then subtracted 24 from the hours, is this needed?
-      // fixme date = date::make_zoned(startDate + date::days{1});
-      //  hours -= 24;
+       // fixme date = date::make_zoned(startDate + date::days{1});
+       //  hours -= 24;
     }
     else
     {
@@ -1621,7 +1621,7 @@ bool VarDriver::read_terrain(std::string& filename, std::vector<MetObs>* metObVe
   if (hours > 23)
   {  // (FIXME : NCAR) The original code added a day here, then subtracted 24 from the hours, is this needed?
      // fixme date = date::make_zoned(startDate + date::days{1});
-    //  hours -= 24;
+     //  hours -= 24;
   }
   else
   {
